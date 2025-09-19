@@ -13,7 +13,7 @@ export default function LoginPage() {
         <div className="p-8 pb-6">
           <div>
             <h1 className="mb-1 mt-4 text-xl font-semibold">
-              Create a S2C Account
+              Create a S2C Netalik Account
             </h1>
             <p className="text-sm">Welcome! Create an account to get started</p>
           </div>

@@ -12,7 +12,7 @@ export default function LoginPage() {
       >
         <div className="p-8 pb-6">
           <div>
-            <h1 className="mb-1 mt-4 text-xl font-semibold">Sign In to S2C</h1>
+            <h1 className="mb-1 mt-4 text-xl font-semibold">Sign In to S2C Netalik</h1>
             <p className="text-sm">Welcome back! Sign in to continue</p>
           </div>
 
