@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useQuery } from "convex/react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { FC, ReactNode, use } from "react";
-import { api } from "../../../convex/_generated/api";
-import { Id } from "../../../convex/_generated/dataModel";
-import { CircleQuestionMark, Hash, LayoutTemplate, User } from "lucide-react";
-import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useAppSelector } from "@/redux/store";
+import { useQuery } from 'convex/react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { FC, ReactNode } from 'react';
+import { api } from '../../../convex/_generated/api';
+import { Id } from '../../../convex/_generated/dataModel';
+import { CircleQuestionMark, Hash, LayoutTemplate, User } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useAppSelector } from '@/redux/store';
 
 type TabProps = {
   label: string;
@@ -19,32 +19,29 @@ type TabProps = {
 
 const Navbar: FC = () => {
   const params = useSearchParams();
-  const projectId = params.get("projectId");
+  const projectId = params.get('projectId');
 
-  const profile = useAppSelector((state) => state.profile);
+  const profile = useAppSelector((state) => state.profile.user)!;
 
   const tabs: TabProps[] = [
     {
-      label: "Canvas",
+      label: 'Canvas',
       href: `/dashboard/xxx/canvas?projectId=${projectId}`,
       icon: <Hash className="w-4 h-4" />,
     },
     {
-      label: "Style Guide",
+      label: 'Style Guide',
       href: `/dashboard/xxx/style-guide?projectId=${projectId}`,
       icon: <LayoutTemplate className="w-4 h-4" />,
     },
   ];
 
-  const project = useQuery(
-    api.projects.getProject,
-    projectId ? { projectId: projectId as Id<"projects"> } : "skip"
-  );
+  const project = useQuery(api.projects.getProject, projectId ? { projectId: projectId as Id<'projects'> } : 'skip');
 
   const pathname = usePathname();
 
-  const hasCanvas = pathname.includes("canvas");
-  const hasStyleGuide = pathname.includes("style-guide");
+  const hasCanvas = pathname.includes('canvas');
+  const hasStyleGuide = pathname.includes('style-guide');
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 p-6 fixed top-0 left-0 right-0 z-50">
@@ -71,17 +68,15 @@ const Navbar: FC = () => {
               key={tab.href}
               href={tab.href}
               className={[
-                "group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition",
+                'group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition',
                 `${pathname}?project=${projectId}` === tab.href
-                  ? "bg-white/[0.12] text-white border border-white/[0.16] backdrop-blur-sm"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] border border-transparent",
-              ].join(" ")}
+                  ? 'bg-white/[0.12] text-white border border-white/[0.16] backdrop-blur-sm'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] border border-transparent',
+              ].join(' ')}
             >
               <span
                 className={
-                  `${pathname}?project=${projectId}` === tab.href
-                    ? "opacity-100"
-                    : `opacity-70 group-hover:opacity-90`
+                  `${pathname}?project=${projectId}` === tab.href ? 'opacity-100' : `opacity-70 group-hover:opacity-90`
                 }
               >
                 {tab.icon}
@@ -102,7 +97,7 @@ const Navbar: FC = () => {
         </Button>
 
         <Avatar className="size-12 ml-2">
-          <AvatarImage src={profile.image || ""} />
+          <AvatarImage src={profile.image || ''} />
           <AvatarFallback>
             <User className="size-5 text-grey" />
           </AvatarFallback>

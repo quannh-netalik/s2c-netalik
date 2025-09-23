@@ -10,6 +10,7 @@ const GoogleAuth = (): ReactNode => {
       onClick={() => void signIn("google")}
       type="button"
       variant="outline"
+      className="cursor-pointer"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
