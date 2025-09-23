@@ -21,7 +21,7 @@ const Navbar: FC = () => {
   const params = useSearchParams();
   const projectId = params.get('projectId');
 
-  const profile = useAppSelector((state) => state.profile.user);
+  const profile = useAppSelector((state) => state.profile.user)!;
 
   const tabs: TabProps[] = [
     {

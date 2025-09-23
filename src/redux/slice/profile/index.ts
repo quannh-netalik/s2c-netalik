@@ -2,7 +2,7 @@ import { Profile } from '@/types/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type ProfileState = {
-  user: Profile;
+  user: Profile | null;
 };
 
 const initialState: ProfileState = {
