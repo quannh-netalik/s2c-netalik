@@ -2,22 +2,29 @@ import { Profile } from '@/types/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type ProfileState = {
-  user: Profile | null;
+  user: Profile;
 };
 
 const initialState: ProfileState = {
-  user: null,
+  user: {
+    id: '',
+    email: '',
+    createdAtMs: 0,
+    image: undefined,
+    name: undefined,
+    emailVerifiedAtMs: undefined,
+  },
 };
 
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
   reducers: {
-    setProfile: (state, action: PayloadAction<Profile | null>) => {
+    setProfile: (state, action: PayloadAction<Profile>) => {
       state.user = action.payload;
     },
     clearProfile: (state) => {
-      state.user = null;
+      state.user = initialState.user;
     },
   },
 });
