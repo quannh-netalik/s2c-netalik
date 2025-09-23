@@ -12,11 +12,15 @@ export const ProfileQuery = async () => {
   );
 };
 
-export const SubscriptionEntitlementQuery = async () => {
+export const getProfile = async () => {
   const rawProfile = await ProfileQuery();
-  const profile = normalizeProfile(
+  return normalizeProfile(
     rawProfile._valueJSON as unknown as ConvexUserRaw | null
   );
+};
+
+export const SubscriptionEntitlementQuery = async () => {
+  const profile = await getProfile();
 
   const entitlement = await preloadQuery(
     api.subscription.hasEntitlement,

@@ -9,6 +9,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { CircleQuestionMark, Hash, LayoutTemplate, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAppSelector } from "@/redux/store";
 
 type TabProps = {
   label: string;
@@ -20,11 +21,7 @@ const Navbar: FC = () => {
   const params = useSearchParams();
   const projectId = params.get("projectId");
 
-  const user = useQuery(api.user.getCurrentUser);
-
-  const project = {} as any;
-
-  const pathname = usePathname();
+  const profile = useAppSelector((state) => state.profile);
 
   const tabs: TabProps[] = [
     {
@@ -39,6 +36,13 @@ const Navbar: FC = () => {
     },
   ];
 
+  const project = useQuery(
+    api.projects.getProject,
+    projectId ? { projectId: projectId as Id<"projects"> } : "skip"
+  );
+
+  const pathname = usePathname();
+
   const hasCanvas = pathname.includes("canvas");
   const hasStyleGuide = pathname.includes("style-guide");
 
@@ -46,10 +50,10 @@ const Navbar: FC = () => {
     <div className="grid grid-cols-2 lg:grid-cols-3 p-6 fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center gap-4">
         <Link
-          href={`/dashboard/`}
+          href={`/dashboard/${profile.name}`}
           className="w-8 h-8 rounded-full border-3 border-white bg-black flex items-center justify-center"
         >
-          <div className="w-4 h-4 rounded-full bg-white">{user?.email}</div>
+          <div className="w-4 h-4 rounded-full bg-white"></div>
         </Link>
 
         {!hasCanvas ||
@@ -98,9 +102,9 @@ const Navbar: FC = () => {
         </Button>
 
         <Avatar className="size-12 ml-2">
-          <AvatarImage />
+          <AvatarImage src={profile.image || ""} />
           <AvatarFallback>
-            <User className="size-5 text-black" />
+            <User className="size-5 text-grey" />
           </AvatarFallback>
         </Avatar>
       </div>
