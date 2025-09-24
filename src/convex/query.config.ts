@@ -5,16 +5,12 @@ import { ConvexUserRaw, normalizeProfile } from '@/types/user';
 import { Id } from '../../convex/_generated/dataModel';
 
 export const ProfileQuery = async () => {
-  return await preloadQuery(api.user.getCurrentUser, {}, { token: await convexAuthNextjsToken() });
-};
-
-export const getProfile = async () => {
-  const rawProfile = await ProfileQuery();
+  const rawProfile = await preloadQuery(api.user.getCurrentUser, {}, { token: await convexAuthNextjsToken() });
   return normalizeProfile(rawProfile._valueJSON as unknown as ConvexUserRaw | null);
 };
 
 export const SubscriptionEntitlementQuery = async () => {
-  const profile = await getProfile();
+  const profile = await ProfileQuery();
 
   const entitlement = await preloadQuery(
     api.subscription.hasEntitlement,
@@ -23,4 +19,23 @@ export const SubscriptionEntitlementQuery = async () => {
   );
 
   return { entitlement, profileName: profile?.name };
+};
+
+export const ProjectsQuery = async () => {
+  const profile = await ProfileQuery();
+
+  if (!profile?.id) {
+    return {
+      projects: null,
+      profile: null,
+    };
+  }
+
+  const projects = await preloadQuery(
+    api.projects.getUserProjects,
+    { userId: profile.id as Id<'users'> },
+    { token: await convexAuthNextjsToken() },
+  );
+
+  return { projects, profile };
 };

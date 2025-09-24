@@ -10,6 +10,7 @@ import { CircleQuestionMark, Hash, LayoutTemplate, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useAppSelector } from '@/redux/store';
+import CreateProject from '../buttons/project';
 
 type TabProps = {
   label: string;
@@ -26,12 +27,12 @@ const Navbar: FC = () => {
   const tabs: TabProps[] = [
     {
       label: 'Canvas',
-      href: `/dashboard/xxx/canvas?projectId=${projectId}`,
+      href: `/dashboard/${profile.name}/canvas?projectId=${projectId}`,
       icon: <Hash className="w-4 h-4" />,
     },
     {
       label: 'Style Guide',
-      href: `/dashboard/xxx/style-guide?projectId=${projectId}`,
+      href: `/dashboard/${profile.name}/style-guide?projectId=${projectId}`,
       icon: <LayoutTemplate className="w-4 h-4" />,
     },
   ];
@@ -69,14 +70,14 @@ const Navbar: FC = () => {
               href={tab.href}
               className={[
                 'group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition',
-                `${pathname}?project=${projectId}` === tab.href
+                `${pathname}?projectId=${projectId}` === tab.href
                   ? 'bg-white/[0.12] text-white border border-white/[0.16] backdrop-blur-sm'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] border border-transparent',
               ].join(' ')}
             >
               <span
                 className={
-                  `${pathname}?project=${projectId}` === tab.href ? 'opacity-100' : `opacity-70 group-hover:opacity-90`
+                  `${pathname}?projectId=${projectId}` === tab.href ? 'opacity-100' : `opacity-70 group-hover:opacity-90`
                 }
               >
                 {tab.icon}
@@ -103,6 +104,7 @@ const Navbar: FC = () => {
           </AvatarFallback>
         </Avatar>
 
+        {!hasCanvas && !hasStyleGuide && <CreateProject />}
       </div>
     </div>
   );

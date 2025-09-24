@@ -17,7 +17,7 @@ export const getProject = query({
       throw new Error('Project not found');
     }
 
-    if (project.userId !== userId || !project.isPublic) {
+    if (project.userId !== userId && !project.isPublic) {
       throw new Error('Access denied');
     }
 
@@ -88,3 +88,27 @@ export const getNextProjectNumber = async (ctx: MutationCtx, userId: Id<'users'>
 
   return projectNumber;
 };
+
+export const getUserProjects = query({
+  args: {
+    userId: v.id('users'),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { userId, limit = 20 }) => {
+    const projects = await ctx.db
+      .query('projects')
+      .withIndex('by_userId', (q) => q.eq('userId', userId))
+      .order('desc')
+      .take(limit);
+
+    return projects.map((project) => ({
+      _id: project._id,
+      name: project.name,
+      projectNumber: project.projectNumber,
+      thumbnail: project.thumbnail,
+      lastModified: project.lastModified,
+      createdAt: project.createdAt,
+      isPublic: project.isPublic,
+    }));
+  },
+});

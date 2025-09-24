@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
 import { ConvexClientProvider } from '@/convex/provider';
 import ReduxProvider from '@/redux/provider';
-import { getProfile } from '@/convex/query.config';
+import { ProfileQuery } from '@/convex/query.config';
 import { RootState } from '@/redux/store';
 
 const geistSans = Geist({
@@ -29,7 +29,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getProfile();
+  const user = await ProfileQuery();
 
   const preloadedState: Partial<RootState> = {
     profile: { user },
