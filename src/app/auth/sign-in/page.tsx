@@ -4,7 +4,7 @@ import GoogleAuth from "@/components/buttons/oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";

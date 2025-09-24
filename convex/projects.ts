@@ -1,25 +1,90 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { v } from 'convex/values';
 
-import { query } from "./_generated/server";
+import { mutation, MutationCtx, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
 
 export const getProject = query({
-  args: { projectId: v.id("projects") },
+  args: { projectId: v.id('projects') },
   handler: async (ctx, { projectId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      throw new Error("Not authenticated");
+      throw new Error('Not authenticated');
     }
 
     const project = await ctx.db.get(projectId);
     if (!project) {
-      throw new Error("Project not found");
+      throw new Error('Project not found');
     }
 
     if (project.userId !== userId || !project.isPublic) {
-      throw new Error("Access denied");
+      throw new Error('Access denied');
     }
 
     return project;
   },
 });
+
+export const createProject = mutation({
+  args: {
+    userId: v.id('users'),
+    name: v.optional(v.string()),
+    sketchesData: v.any(),
+    thumbnail: v.optional(v.string()),
+  },
+  handler: async (ctx, { userId, name, sketchesData, thumbnail }) => {
+    console.log('🚀 [Convex] Creating project for user:', userId);
+
+    const projectNumber = await getNextProjectNumber(ctx, userId);
+    const projectName = name || `Project ${projectNumber}`;
+
+    const projectId = await ctx.db.insert('projects', {
+      userId,
+      name: projectName,
+      sketchesData,
+      thumbnail,
+      projectNumber,
+      lastModified: Date.now(),
+      createdAt: Date.now(),
+      isPublic: false,
+    });
+
+    const result = {
+      projectId,
+      name: projectName,
+      projectNumber,
+    };
+
+    console.log('✅ [Convex] Create Project successfully!', result);
+    return result;
+  },
+});
+
+const PROJECT_NUMBER_START = 1;
+
+export const getNextProjectNumber = async (ctx: MutationCtx, userId: Id<'users'>): Promise<number> => {
+  // Get or create project counter for this user
+  const counter = await ctx.db
+    .query('project_counters')
+    .withIndex('by_userId', (q) => q.eq('userId', userId))
+    .first();
+
+  if (!counter) {
+    // Create new Counter starting at 1
+    await ctx.db.insert('project_counters', {
+      userId,
+      nextProjectNumber: PROJECT_NUMBER_START + 1,
+    });
+
+    return PROJECT_NUMBER_START;
+  }
+
+  const projectNumber = counter.nextProjectNumber;
+
+  // Increment counter for next time
+  await ctx.db.patch(counter._id, {
+    nextProjectNumber: projectNumber + 1,
+  });
+
+  return projectNumber;
+};

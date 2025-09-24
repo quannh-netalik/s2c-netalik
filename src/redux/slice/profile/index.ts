@@ -1,7 +1,7 @@
 import { Profile } from '@/types/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type ProfileState = {
+export type ProfileState = {
   user: Profile | null;
 };
 
