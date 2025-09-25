@@ -39,3 +39,28 @@ export const ProjectsQuery = async () => {
 
   return { projects, profile };
 };
+
+export const StyleGuideQuery = async (projectId: string) => {
+  const styleGuide = await preloadQuery(
+    api.projects.getProject,
+    {
+      projectId: projectId as Id<'projects'>,
+      isGetStyleGuide: true,
+    },
+    { token: await convexAuthNextjsToken() },
+  );
+
+  return { styleGuide };
+};
+
+export const MoodBoardImagesQuery = async (projectId: string) => {
+  const images = await preloadQuery(
+    api.moodBoard.getMoodBoardImages,
+    {
+      projectId: projectId as Id<'projects'>,
+    },
+    { token: await convexAuthNextjsToken() },
+  );
+
+  return { images };
+};

@@ -5,8 +5,11 @@ import { mutation, MutationCtx, query } from './_generated/server';
 import { Id } from './_generated/dataModel';
 
 export const getProject = query({
-  args: { projectId: v.id('projects') },
-  handler: async (ctx, { projectId }) => {
+  args: {
+    projectId: v.id('projects'),
+    isGetStyleGuide: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { projectId, isGetStyleGuide }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error('Not authenticated');
@@ -19,6 +22,10 @@ export const getProject = query({
 
     if (project.userId !== userId && !project.isPublic) {
       throw new Error('Access denied');
+    }
+
+    if (isGetStyleGuide) {
+      return project.styleGuide ? JSON.parse(project.styleGuide) : null;
     }
 
     return project;

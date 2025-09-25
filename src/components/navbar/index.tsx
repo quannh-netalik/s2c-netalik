@@ -3,7 +3,7 @@
 import { useQuery } from 'convex/react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useMemo } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { CircleQuestionMark, Hash, LayoutTemplate, User } from 'lucide-react';
@@ -24,18 +24,21 @@ const Navbar: FC = () => {
 
   const profile = useAppSelector((state) => state.profile.user)!;
 
-  const tabs: TabProps[] = [
-    {
-      label: 'Canvas',
-      href: `/dashboard/${profile.name}/canvas?projectId=${projectId}`,
-      icon: <Hash className="w-4 h-4" />,
-    },
-    {
-      label: 'Style Guide',
-      href: `/dashboard/${profile.name}/style-guide?projectId=${projectId}`,
-      icon: <LayoutTemplate className="w-4 h-4" />,
-    },
-  ];
+  const tabs: TabProps[] = useMemo(
+    () => [
+      {
+        label: 'Canvas',
+        href: `/dashboard/${profile.name}/canvas?projectId=${projectId}`,
+        icon: <Hash className="w-4 h-4" />,
+      },
+      {
+        label: 'Style Guide',
+        href: `/dashboard/${profile.name}/style-guide?projectId=${projectId}`,
+        icon: <LayoutTemplate className="w-4 h-4" />,
+      },
+    ],
+    [profile.name, projectId],
+  );
 
   const project = useQuery(api.projects.getProject, projectId ? { projectId: projectId as Id<'projects'> } : 'skip');
 
@@ -77,7 +80,9 @@ const Navbar: FC = () => {
             >
               <span
                 className={
-                  `${pathname}?projectId=${projectId}` === tab.href ? 'opacity-100' : `opacity-70 group-hover:opacity-90`
+                  `${pathname}?projectId=${projectId}` === tab.href
+                    ? 'opacity-100'
+                    : `opacity-70 group-hover:opacity-90`
                 }
               >
                 {tab.icon}
