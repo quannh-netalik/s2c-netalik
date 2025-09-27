@@ -1,8 +1,8 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 
-import { mutation, MutationCtx, query } from './_generated/server';
-import { Id } from './_generated/dataModel';
+import { mutation, query } from './_generated/server';
+import { getNextProjectNumber, getProjectsByUserId } from './utils/project.util';
+import { getUserId } from './utils/user.util';
 
 export const getProject = query({
   args: {
@@ -10,19 +10,9 @@ export const getProject = query({
     isGetStyleGuide: v.optional(v.boolean()),
   },
   handler: async (ctx, { projectId, isGetStyleGuide }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error('Not authenticated');
-    }
+    const userId = await getUserId(ctx);
 
-    const project = await ctx.db.get(projectId);
-    if (!project) {
-      throw new Error('Project not found');
-    }
-
-    if (project.userId !== userId && !project.isPublic) {
-      throw new Error('Access denied');
-    }
+    const project = await getProjectsByUserId(ctx, projectId, userId);
 
     if (isGetStyleGuide) {
       return project.styleGuide ? JSON.parse(project.styleGuide) : null;
@@ -66,35 +56,6 @@ export const createProject = mutation({
     return result;
   },
 });
-
-const PROJECT_NUMBER_START = 1;
-
-export const getNextProjectNumber = async (ctx: MutationCtx, userId: Id<'users'>): Promise<number> => {
-  // Get or create project counter for this user
-  const counter = await ctx.db
-    .query('project_counters')
-    .withIndex('by_userId', (q) => q.eq('userId', userId))
-    .first();
-
-  if (!counter) {
-    // Create new Counter starting at 1
-    await ctx.db.insert('project_counters', {
-      userId,
-      nextProjectNumber: PROJECT_NUMBER_START + 1,
-    });
-
-    return PROJECT_NUMBER_START;
-  }
-
-  const projectNumber = counter.nextProjectNumber;
-
-  // Increment counter for next time
-  await ctx.db.patch(counter._id, {
-    nextProjectNumber: projectNumber + 1,
-  });
-
-  return projectNumber;
-};
 
 export const getUserProjects = query({
   args: {

@@ -27,11 +27,11 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className={cn([
+                    className={cn(
                       'flex items-center gap-2 rounded-xl  transition-all duration-200 text-xs sm:text-sm w-full',
                       'data-[state=active]:bg-white/[0.15] data-[state=active]:backdrop-blur-xld data-[state=active]:border data-[state=active]:border-white/[0.2]',
                       'cursor-pointer hover:text-zinc-200 hover:bg-white/[0.06]',
-                    ])}
+                    )}
                   >
                     <Icon className="w-4 h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>

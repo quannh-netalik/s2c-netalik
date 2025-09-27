@@ -7,6 +7,8 @@ import StyleGuideColor from '@/components/style/colors';
 
 import { mockMoodBoardImages } from '@/hooks/__mock__/use-style.mock';
 import { mockStyleGuide } from '@/redux/api/style-guide/__mock__';
+import StyleGuideMoodBoard from '@/components/style/mood-board';
+import { MoodBoardImage } from '@/hooks/use-style';
 
 type PageProps = {
   searchParams: Promise<{
@@ -25,9 +27,9 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
   const typographyGuide = guide?.typographySections || [];
 
   const existingMoodBoardImages = await MoodBoardImagesQuery(projectId);
-  // const guideImages = existingMoodBoardImages.images._valueJSON as unknown as MoodBoardImage[];
+  const guideImages = existingMoodBoardImages.images._valueJSON as unknown as MoodBoardImage[];
 
-  const guideImages = mockMoodBoardImages;
+  // const guideImages = mockMoodBoardImages;
   return (
     <div>
       <StyleGuideTabContent value="colors" className="space-y-8">
@@ -36,6 +38,10 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
 
       <StyleGuideTabContent value="typography">
         <StyleGuideTypoGraphy typographyGuide={typographyGuide} />
+      </StyleGuideTabContent>
+
+      <StyleGuideTabContent value="moodBoard">
+        <StyleGuideMoodBoard guideImages={guideImages} />
       </StyleGuideTabContent>
     </div>
   );
