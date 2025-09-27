@@ -6,27 +6,27 @@ import { TabsContent } from '@/components/ui/tabs';
 
 export type StyleGuideTabValue = 'colors' | 'typography' | 'moodBoard';
 
-export type Tab = {
+export type StyleGuideTab = {
   value: StyleGuideTabValue;
   label: string;
-  icon: ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>;
+  Icon: ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>;
 };
 
-export const tabs: Tab[] = [
+export const tabs: StyleGuideTab[] = [
   {
     value: 'colors',
     label: 'Colors',
-    icon: Hash,
+    Icon: Hash,
   },
   {
     value: 'typography',
     label: 'Typography',
-    icon: Type,
+    Icon: Type,
   },
   {
     value: 'moodBoard',
     label: 'Mood Board',
-    icon: LayoutIcon,
+    Icon: LayoutIcon,
   },
 ] as const;
 

@@ -21,24 +21,21 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
             </div>
 
             <TabsList className="grid w-full sm:w-fit h-auto grid-cols-3 rounded-full backdrop-blur-xl bg-white/[0.08] border border-white/[0.12] saturate-150 p-2 gap-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className={cn(
-                      'flex items-center gap-2 rounded-xl  transition-all duration-200 text-xs sm:text-sm w-full',
-                      'data-[state=active]:bg-white/[0.15] data-[state=active]:backdrop-blur-xld data-[state=active]:border data-[state=active]:border-white/[0.2]',
-                      'cursor-pointer hover:text-zinc-200 hover:bg-white/[0.06]',
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.value}</span>
-                  </TabsTrigger>
-                );
-              })}
+              {tabs.map(({ label, value, Icon }) => (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  className={cn(
+                    'flex items-center gap-2 rounded-xl  transition-all duration-200 text-xs sm:text-sm w-full',
+                    'data-[state=active]:bg-white/[0.15] data-[state=active]:backdrop-blur-xld data-[state=active]:border data-[state=active]:border-white/[0.2]',
+                    'cursor-pointer hover:text-zinc-200 hover:bg-white/[0.06]',
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{value}</span>
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
         </div>

@@ -8,7 +8,7 @@ const Loading = () => {
         <Loader2
           className={cn(
             "h-8 w-8 animate-spin text-primary",
-            "transition-colors duration-200"
+            "transition-colors duration-100"
           )}
         />
 
