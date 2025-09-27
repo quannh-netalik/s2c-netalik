@@ -41,7 +41,7 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
   const addMoodBoardImage = useMutation(api.moodBoard.addMoodBoardImage);
 
   const uploadImage = useCallback(
-    async (file: File): Promise<{ storageId: string; url?: string }> => {
+    async (file: File): Promise<{ storageId: string }> => {
       try {
         const uploadUrl = await generateUploadUrl();
         const result = await fetch(uploadUrl, {
@@ -58,12 +58,6 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
 
         const { storageId } = await result.json();
 
-        if (projectId) {
-          await addMoodBoardImage({
-            projectId: projectId as Id<'projects'>,
-            storageId,
-          });
-        }
         return {
           storageId,
         };
@@ -72,7 +66,7 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
         throw error;
       }
     },
-    [addMoodBoardImage, generateUploadUrl, projectId],
+    [generateUploadUrl],
   );
 
   useEffect(() => {
@@ -96,8 +90,6 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
         serverImages.forEach((serverImg) => {
           const clientIndex = mergedImages.findIndex((clientImg) => clientImg.storageId === serverImg.storageId);
 
-          console.log(JSON.stringify(mergedImages));
-          console.log('--', clientIndex);
           if (clientIndex !== -1) {
             // Clean up old blob URL if it exists
             if (mergedImages[clientIndex].preview.startsWith('blob:')) {
@@ -114,28 +106,97 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
     }
   }, [guideImages, setValue, getValues]);
 
+  const startUploadingProcess = useCallback(
+    async (updatedImages: MoodBoardImage[]) => {
+      // Initial Loading State
+      setValue('images', [...getValues('images'), ...updatedImages]);
+
+      // Start upload process
+      const _uploadProcesses = await Promise.allSettled(
+        updatedImages.map(async (image) => {
+          try {
+            const { storageId } = await uploadImage(image.file!);
+
+            return {
+              id: image.id,
+              storageId,
+            };
+          } catch (error) {
+            console.error(error);
+            const errorImages = getValues('images');
+            const errorIndex = errorImages.findIndex((img) => img.id === image.id);
+            if (errorIndex !== -1) {
+              errorImages[errorIndex] = {
+                ...errorImages[errorIndex],
+                uploading: false,
+                error: 'Upload failed',
+              };
+              setValue('images', errorImages);
+            }
+          }
+        }),
+      );
+
+      // Map fulfilled process as {id}:{storageId}
+      const mapIdStorageId = new Map<string, string>();
+      for (let i = 0; i < _uploadProcesses.length; i++) {
+        const process = _uploadProcesses[i];
+        if (process.status === 'fulfilled' && process.value) {
+          mapIdStorageId.set(process.value.id, process.value.storageId);
+        }
+      }
+
+      // Update to Convex Server with state handling
+      for (const updatedImage of updatedImages) {
+        const storageId = mapIdStorageId.get(updatedImage.id);
+
+        // If promise is rejected, it will not be set in fulfilled storageId state
+        // Checking storageId ensures that the uploading image has been uploaded to a store
+        if (storageId) {
+          await addMoodBoardImage({
+            projectId: projectId as Id<'projects'>,
+            storageId: storageId as Id<'_storage'>,
+          });
+
+          const finalImages = getValues('images');
+          const finalIndex = finalImages.findIndex((img) => img.id === updatedImage.id);
+          if (finalIndex !== -1) {
+            finalImages[finalIndex] = {
+              ...finalImages[finalIndex],
+              storageId,
+              uploaded: true,
+              uploading: false,
+              isFromServer: true, // Now it's server image
+            };
+            setValue('images', finalImages);
+          }
+        }
+      }
+
+      toast.success('Image added to mood board');
+    },
+    [addMoodBoardImage, getValues, projectId, setValue, uploadImage],
+  );
+
   const addImage = useCallback(
-    (file: File) => {
-      if (images.length >= 5) {
+    (files: File[]) => {
+      if (images.length + files.length > 5) {
         toast.error('Maximum 5 images allowed');
         return;
       }
 
-      const newImage: MoodBoardImage = {
+      const newImages: MoodBoardImage[] = files.map((file) => ({
         id: `${Date.now()}-${Math.random()}`,
         file,
         preview: URL.createObjectURL(file),
         uploaded: false,
-        uploading: false,
+        uploading: true, // Start uploading process
         isFromServer: false,
-      };
+      }));
 
-      const updatedImages = [...images, newImage];
-      setValue('images', updatedImages);
-
-      toast.success('Image added to mood board');
+      startUploadingProcess(newImages);
     },
-    [images, setValue],
+    [images, startUploadingProcess],
   );
 
   const removeImage = useCallback(
@@ -199,78 +260,21 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
         return;
       }
 
-      // Add each image file
-      imageFiles.forEach((file) => {
-        if (images.length < 5) {
-          addImage(file);
-        }
-      });
+      addImage(imageFiles);
     },
-    [addImage, images.length],
+    [addImage],
   );
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
-      files.forEach((file) => addImage(file));
+      addImage(files);
 
       // Reset input
       e.target.value = '';
     },
     [addImage],
   );
-
-  useEffect(() => {
-    const uploadPendingImages = async () => {
-      const currentImages = getValues('images');
-      for (let i = 0; i < currentImages.length; i++) {
-        const image = currentImages[i];
-        if (!image.uploaded && !image.uploading && !image.error) {
-          const updatedImages = [...currentImages];
-          updatedImages[i] = {
-            ...image,
-            uploading: true,
-          };
-
-          setValue('images', updatedImages);
-
-          try {
-            const { storageId } = await uploadImage(image.file!);
-            
-            const finalImages = getValues('images');
-            const finalIndex = finalImages.findIndex((img) => img.id === image.id);
-
-            if (finalIndex !== -1) {
-              finalImages[finalIndex] = {
-                ...finalImages[finalIndex],
-                storageId,
-                uploaded: true,
-                uploading: false,
-                isFromServer: true, // Now it's server image
-              };
-              setValue('images', [...finalImages])
-            }
-          } catch (error) {
-            console.error(error);
-            const errorImages = getValues('images');
-            const errorIndex = errorImages.findIndex((img) => img.id === image.id);
-            if (errorIndex !== -1) {
-              errorImages[errorIndex] = {
-                ...errorImages[errorIndex],
-                uploading: false,
-                error: 'Upload failed',
-              };
-              setValue('images', [...errorImages]);
-            }
-          }
-        }
-      }
-    };
-
-    if (images.length > 0) {
-      uploadPendingImages();
-    }
-  }, [getValues, images, setValue, uploadImage]);
 
   useEffect(() => {
     return () => {

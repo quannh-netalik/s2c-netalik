@@ -15,7 +15,12 @@ export const getProject = query({
     const project = await getProjectsByUserId(ctx, projectId, userId);
 
     if (isGetStyleGuide) {
-      return project.styleGuide ? JSON.parse(project.styleGuide) : null;
+      try {
+        return project.styleGuide ? JSON.parse(project.styleGuide) : null;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
     }
 
     return project;
