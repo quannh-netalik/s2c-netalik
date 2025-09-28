@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { BreakPoint, useIsMobile } from '@/hooks/use-mobile';
 
-const MobileImageBoard = dynamic(() => import('./responsive-image-board/mobile-image-board'), { ssr: false });
-const DesktopImageBoard = dynamic(() => import('./responsive-image-board/desktop-image-board'), { ssr: false });
-const EmptyImageBoard = dynamic(() => import('./responsive-image-board/empty-image-board'), { ssr: false });
+const MobileImageBoard = dynamic(() => import('./responsive-image-board/mobile-image-board'));
+const DesktopImageBoard = dynamic(() => import('./responsive-image-board/desktop-image-board'));
+const EmptyImageBoard = dynamic(() => import('./responsive-image-board/empty-image-board'));
 
 type StyleGuideMoodBoardProps = {
   guideImages: MoodBoardImage[];
