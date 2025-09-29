@@ -242,7 +242,7 @@ const makeText = (p: {
   fontFamily?: string;
   fontWeight?: number;
   fontStyle?: 'normal' | 'italic';
-  textAlign: 'left' | 'center' | 'right';
+  textAlign?: 'left' | 'center' | 'right';
   textDecoration?: 'none' | 'underline' | 'line-through';
   lineHeight?: number;
   letterSpacing?: number;
