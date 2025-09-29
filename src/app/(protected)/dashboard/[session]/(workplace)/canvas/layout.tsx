@@ -1,3 +1,4 @@
+import Toolbar from '@/components/canvas/toolbar';
 import { FC, ReactNode } from 'react';
 
 type LayoutProps = {
@@ -5,7 +6,12 @@ type LayoutProps = {
 };
 
 const Layout: FC<LayoutProps> = async ({ children }) => {
-  return <div>{children}</div>;
+  return (
+    <div className="w-full h-screen">
+      {children}
+      <Toolbar />
+    </div>
+  );
 };
 
 export default Layout;
