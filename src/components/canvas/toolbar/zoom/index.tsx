@@ -21,17 +21,28 @@ const ZoomBar: FC = () => {
 
   // Set up resize listener
   useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    let timeoutId: NodeJS.Timeout;
+
     const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }, 150); // Wait 150ms after resize stops
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { signal });
 
     // Cleanup listener on unmount
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, []); // Empty deps: set up once on mount
 
   // Recalculate center point when window resizes
