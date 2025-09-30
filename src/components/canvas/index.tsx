@@ -2,6 +2,7 @@
 
 import { useInfiniteCanvas } from '@/hooks/use-canvas';
 import { FC, Fragment } from 'react';
+import TextSideBar from './text-sidebar';
 import { cn } from '@/lib/utils';
 
 const InfiniteCanvas: FC = () => {
@@ -23,6 +24,7 @@ const InfiniteCanvas: FC = () => {
 
   return (
     <Fragment>
+      <TextSideBar isOpen={isSidebarOpen && hasSelectedText} />
       {/* Inspiration */}
       {/* ChatWindow */}
 
