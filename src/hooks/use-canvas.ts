@@ -84,6 +84,8 @@ export const useInfiniteCanvas = () => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const touchMapRef = useRef<Map<number, TouchPointer>>(new Map());
 
+  const buttonActionRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
   // Preview shape for the mouse while drawing
   const draftShapeRef = useRef<DraftShape | null>(null);
   const freeDrawPointsRef = useRef<Point[]>([]);
@@ -663,29 +665,31 @@ export const useInfiniteCanvas = () => {
     [onPointerUp],
   );
 
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent): void => {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent): void => {
       if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) {
         e.preventDefault();
         isSpacePressed.current = true; // Keep the same ref name for consistency
         dispatch(handToolEnable());
       }
-    },
-    [dispatch],
-  );
 
-  const onKeyUp = useCallback(
-    (e: KeyboardEvent): void => {
+      // 👇 Escape: reset tool to "select"
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        dispatch(setTool('select'));
+        buttonActionRefs.current['select']?.focus();
+        dispatch(clearSelection()); // [optional] deselect everything
+      }
+    };
+
+    const onKeyUp = (e: KeyboardEvent): void => {
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
         e.preventDefault();
         isSpacePressed.current = false;
         dispatch(handToolDisable());
       }
-    },
-    [dispatch],
-  );
+    };
 
-  useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -881,6 +885,14 @@ export const useInfiniteCanvas = () => {
     [onWheel],
   );
 
+  useEffect(() => {
+    return () => {
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('wheel', onWheel);
+      }
+    };
+  }, [onWheel]);
+
   const selectTool = useCallback(
     (tool: Tool): void => {
       dispatch(setTool(tool));
@@ -910,5 +922,6 @@ export const useInfiniteCanvas = () => {
     isSidebarOpen,
     hasSelectedText,
     setIsSidebarOpen,
+    buttonActionRefs,
   };
 };

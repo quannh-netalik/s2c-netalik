@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const ToolBarShapes: FC = () => {
-  const { currentTool, selectTool } = useInfiniteCanvas();
+  const { currentTool, buttonActionRefs, selectTool } = useInfiniteCanvas();
 
   return (
     <div className="col-span-1 flex justify-center items-center">
@@ -15,6 +15,9 @@ const ToolBarShapes: FC = () => {
         {toolActions.map((tool) => (
           <Button
             key={tool.id}
+            ref={(el: HTMLButtonElement | null) => {
+              buttonActionRefs.current[tool.id] = el;
+            }}
             variant="ghost"
             size="lg"
             onClick={() => selectTool(tool.id)}
