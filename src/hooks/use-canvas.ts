@@ -207,8 +207,9 @@ export const useInfiniteCanvas = () => {
             point.y >= shape.y &&
             point.y <= shape.y + shape.h
           );
-        case 'free-draw':
+        case 'free-draw': {
           const threshold = 5;
+
           for (let i = 0; i < shape.points.length - 1; i++) {
             const p1 = shape.points[i];
             const p2 = shape.points[i + 1];
@@ -217,9 +218,9 @@ export const useInfiniteCanvas = () => {
             }
           }
           return false;
-
+        }
         case 'arrow':
-        case 'line':
+        case 'line': {
           const lineThreshold = 8;
 
           return (
@@ -229,7 +230,8 @@ export const useInfiniteCanvas = () => {
               { x: shape.endX, y: shape.endY },
             ) <= lineThreshold
           );
-        case 'text':
+        }
+        case 'text': {
           const textWidth = Math.max(shape.text.length * (shape.fontSize * 0.6), 100);
           const textHeight = shape.fontSize * 1.2;
           const padding = 8;
@@ -240,6 +242,7 @@ export const useInfiniteCanvas = () => {
             point.y >= shape.y - 2 &&
             point.y <= shape.y + textHeight + padding + 2
           );
+        }
         default:
           return false;
       }
@@ -267,8 +270,10 @@ export const useInfiniteCanvas = () => {
       if (pendingPanPointRef.current !== null) return;
 
       panRafRef.current = window.requestAnimationFrame(() => {
-        panRafRef.current = null;
         const next = pendingPanPointRef.current;
+        pendingPanPointRef.current = null;
+        panRafRef.current = null;
+        
         if (next) {
           dispatch(panMove(next));
         }
