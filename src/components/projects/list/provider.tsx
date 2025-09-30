@@ -7,7 +7,7 @@ import { Preloaded } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-type ProjectProviderProps = {
+type ProjectListProviderProps = {
   children: ReactNode;
   initialProjects: Preloaded<
     FunctionReference<
@@ -23,7 +23,7 @@ type ProjectProviderProps = {
   >;
 };
 
-const ProjectProvider: FC<ProjectProviderProps> = ({ children, initialProjects }) => {
+const ProjectListProvider: FC<ProjectListProviderProps> = ({ children, initialProjects }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -42,4 +42,4 @@ const ProjectProvider: FC<ProjectProviderProps> = ({ children, initialProjects }
   return <Fragment>{children}</Fragment>;
 };
 
-export default ProjectProvider;
+export default ProjectListProvider;

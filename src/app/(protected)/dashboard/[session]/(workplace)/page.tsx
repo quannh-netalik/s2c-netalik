@@ -1,5 +1,5 @@
 import ProjectList from '@/components/projects/list';
-import ProjectProvider from '@/components/projects/list/provider';
+import ProjectListProvider from '@/components/projects/list/provider';
 import { ProjectsQuery } from '@/convex/query.config';
 
 const Page = async () => {
@@ -17,11 +17,11 @@ const Page = async () => {
   }
 
   return (
-    <ProjectProvider initialProjects={projects}>
+    <ProjectListProvider initialProjects={projects}>
       <div className="container mx-auto py-36 px-4">
         <ProjectList />
       </div>
-    </ProjectProvider>
+    </ProjectListProvider>
   );
 };
 
