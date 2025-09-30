@@ -38,6 +38,8 @@ interface TouchPointer {
 }
 
 const RAF_INTERVAL_MS = 8;
+const SHAPE_MIN_SIZE = 10;
+const RESIZE_PADDING = 5;
 
 interface DraftShape {
   type: 'frame' | 'rect' | 'ellipse' | 'arrow' | 'line';
@@ -148,10 +150,13 @@ export const useInfiniteCanvas = () => {
   }, []);
 
   const blurActiveTextInput = useCallback(() => {
-    const activeElement = document.activeElement;
-    if (activeElement && activeElement.tagName === 'INPUT') {
-      (activeElement as HTMLInputElement).blur();
-    }
+    const el = document.activeElement as HTMLElement | null;
+    if (!el) return;
+
+    const isInput = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA';
+    const isEditable = el.isContentEditable;
+
+    if (isInput || isEditable) el.blur();
   }, []);
 
   const getLocalPointFromPtr = useCallback(
@@ -774,10 +779,10 @@ export const useInfiniteCanvas = () => {
         const width = maxX - minX;
         const height = maxY - minY;
 
-        const newX = newBounds.x + 5; // remove padding
-        const newY = newBounds.y + 5;
-        const newWidth = Math.max(10, newBounds.w - 10); // Minimum size and remove padding
-        const newHeight = Math.max(10, newBounds.h - 10);
+        const newX = newBounds.x + RESIZE_PADDING; // remove padding
+        const newY = newBounds.y + RESIZE_PADDING;
+        const newWidth = Math.max(SHAPE_MIN_SIZE, newBounds.w - RESIZE_PADDING * 2); // Minimum size and remove padding
+        const newHeight = Math.max(SHAPE_MIN_SIZE, newBounds.h - RESIZE_PADDING * 2);
 
         const scaleX = width > 0 ? newWidth / width : 1;
         const scaleY = height > 0 ? newHeight / height : 1;
@@ -803,10 +808,10 @@ export const useInfiniteCanvas = () => {
         const width = maxX - minX;
         const height = maxY - minY;
 
-        const newX = newBounds.x + 5;
-        const newY = newBounds.y + 5;
-        const newWidth = Math.max(10, newBounds.w - 10); // Minimum size and remove padding
-        const newHeight = Math.max(10, newBounds.h - 10);
+        const newX = newBounds.x + RESIZE_PADDING;
+        const newY = newBounds.y + RESIZE_PADDING;
+        const newWidth = Math.max(SHAPE_MIN_SIZE, newBounds.w - RESIZE_PADDING * 2); // Minimum size and remove padding
+        const newHeight = Math.max(SHAPE_MIN_SIZE, newBounds.h - RESIZE_PADDING * 2);
 
         let newStartX, newStartY, newEndX, newEndY;
         if (width === 0) {
