@@ -97,7 +97,7 @@ const shapesAdapter = createEntityAdapter<Shape, string>({
   selectId: (s) => s.id,
 });
 
-type SelectionMap = Record<string, true>;
+export type SelectionMap = Record<string, true>;
 
 export interface ShapesState {
   tool: Tool;
