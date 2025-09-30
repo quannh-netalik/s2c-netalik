@@ -96,7 +96,7 @@ const viewportSlice = createSlice({
         const t = zoomAroundScreenPoint(originScreen, clamped, state.translate, state.scale);
 
         state.translate.x = t.x;
-        state.translate.x = t.y;
+        state.translate.y = t.y;
       }
 
       state.scale = clamped;
