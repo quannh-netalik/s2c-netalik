@@ -18,6 +18,7 @@ import {
   updateShape,
 } from '@/redux/slice/shapes';
 import {
+  handToolDisable,
   handToolEnable,
   panEnd,
   panMove,
@@ -273,7 +274,7 @@ export const useInfiniteCanvas = () => {
         const next = pendingPanPointRef.current;
         pendingPanPointRef.current = null;
         panRafRef.current = null;
-        
+
         if (next) {
           dispatch(panMove(next));
         }
@@ -673,7 +674,7 @@ export const useInfiniteCanvas = () => {
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
         e.preventDefault();
         isSpacePressed.current = false;
-        dispatch(handToolEnable());
+        dispatch(handToolDisable());
       }
     },
     [dispatch],
