@@ -5,22 +5,57 @@ import { useInfiniteCanvas } from '@/hooks/use-canvas';
 import { setScale } from '@/redux/slice/viewport';
 import { AppDispatch } from '@/redux/store';
 import { ZoomIn, ZoomOut } from 'lucide-react';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const ZoomBar: FC = () => {
   const { viewport } = useInfiniteCanvas();
   const dispatch = useDispatch<AppDispatch>();
 
+  // Refers to: https://github.com/quannh-netalik/s2c-netalik/pull/3#discussion_r2391707569
+  // Track window dimensions
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  // Set up resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup listener on unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []); // Empty deps: set up once on mount
+
+  // Recalculate center point when window resizes
+  const originScreen = useMemo(
+    () => ({
+      x: windowSize.width / 2,
+      y: windowSize.height / 2,
+    }),
+    [windowSize.width, windowSize.height],
+  );
+
   const handleZoomOut = useCallback(() => {
-    const newScale = Math.max(viewport.scale / 1.2, viewport.minScale);
-    dispatch(setScale({ scale: newScale }));
-  }, [dispatch, viewport.minScale, viewport.scale]);
+    const raw = viewport.scale / 1.2;
+    const clamped = Math.max(raw, viewport.minScale);
+    const newScale = parseFloat(clamped.toFixed(3));
+    dispatch(setScale({ scale: newScale, originScreen }));
+  }, [dispatch, viewport.minScale, viewport.scale, originScreen]);
 
   const handleZoomIn = useCallback(() => {
-    const newScale = Math.min(viewport.scale * 1.2, viewport.maxScale);
-    dispatch(setScale({ scale: newScale }));
-  }, [dispatch, viewport.maxScale, viewport.scale]);
+    const raw = viewport.scale * 1.2;
+    const clamped = Math.min(raw, viewport.maxScale);
+    const newScale = parseFloat(clamped.toFixed(3));
+    dispatch(setScale({ scale: newScale, originScreen }));
+  }, [dispatch, viewport.maxScale, viewport.scale, originScreen]);
 
   return (
     <div className="col-span-1 flex justify-end items-center">
