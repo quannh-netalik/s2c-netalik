@@ -82,12 +82,8 @@ export const useInfiniteCanvas = () => {
   );
 
   useEffect(() => {
-    if (hasSelectedText && !isSidebarOpen) {
-      setIsSidebarOpen(true);
-    } else if (!hasSelectedText) {
-      setIsSidebarOpen(false);
-    }
-  }, [hasSelectedText, isSidebarOpen]);
+    setIsSidebarOpen(hasSelectedText);
+  }, [hasSelectedText]);
 
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const touchMapRef = useRef<Map<number, TouchPointer>>(new Map());
@@ -141,9 +137,15 @@ export const useInfiniteCanvas = () => {
   const panRafRef = useRef<number | null>(null);
   const pendingPanPointRef = useRef<Point | null>(null);
 
+  // Add mounted ref to prevent setState after unmount
+  const isMountedRef = useRef<boolean>(true);
+
   const [, force] = useState(0);
   const requestRender = useCallback((): void => {
-    force((n) => (n + 1) | 0);
+    // Check if mounted before updating state
+    if (isMountedRef.current) {
+      force((n) => (n + 1) | 0);
+    }
   }, []);
 
   const localPointFromClient = useCallback((clientX: number, clientY: number): Point => {
@@ -283,13 +285,11 @@ export const useInfiniteCanvas = () => {
   const schedulePanMove = useCallback(
     (p: Point) => {
       pendingPanPointRef.current = p;
-      if (pendingPanPointRef.current !== null) return;
+      if (panRafRef.current !== null) return;
 
       panRafRef.current = window.requestAnimationFrame(() => {
-        const next = pendingPanPointRef.current;
-        pendingPanPointRef.current = null;
         panRafRef.current = null;
-
+        const next = pendingPanPointRef.current;
         if (next) {
           dispatch(panMove(next));
         }
@@ -371,6 +371,11 @@ export const useInfiniteCanvas = () => {
       if (isButton) {
         console.log('🪞 Not preventing default - clicked on interactive element:');
         return; // Don't handle canvas interactions when clicking buttons
+      }
+
+      // Prevent new interactions while resizing
+      if (isResizingRef.current) {
+        return;
       }
 
       e.preventDefault();
@@ -764,26 +769,58 @@ export const useInfiniteCanvas = () => {
       if (!shape) return;
 
       const newBounds = { ...initialBounds };
+
+      //    nw (top-left)     ne (top-right)
+      //           +----------+
+      //           |          |
+      //           |          |
+      //           +----------+
+      //    sw (bottom-left)  se (bottom-right)
       switch (corner) {
         case 'nw':
-          newBounds.w = Math.max(10, initialBounds.w + (initialBounds.x - world.x));
-          newBounds.h = Math.max(10, initialBounds.h + (initialBounds.y - world.y));
-          newBounds.x = world.x;
-          newBounds.y = world.y;
+          // 📍 Dragging TOP-LEFT corner
+          // The BOTTOM-RIGHT corner stays put (like it's pinned to the wall)
+          // We're pulling/pushing the top-left, so the box grows/shrinks
+
+          // Step 1: Calculate new width and height
+          // "How far is the mouse from the pinned bottom-right corner?"
+          newBounds.w = Math.max(SHAPE_MIN_SIZE, initialBounds.w + (initialBounds.x - world.x));
+          newBounds.h = Math.max(SHAPE_MIN_SIZE, initialBounds.h + (initialBounds.y - world.y));
+
+          // Step 2: Move the top-left corner (x, y) to match
+          // "Where does the top-left need to be so the bottom-right stays put?"
+          newBounds.x = initialBounds.x + initialBounds.w - newBounds.w;
+          newBounds.y = initialBounds.y + initialBounds.h - newBounds.h;
           break;
         case 'ne':
-          newBounds.w = Math.max(10, world.x - initialBounds.x);
-          newBounds.h = Math.max(10, initialBounds.y - world.y);
-          newBounds.y = world.y;
+          // 📍 Dragging TOP-RIGHT corner
+          // The BOTTOM-LEFT corner stays put
+          // Left side (x) doesn't move, but right side stretches
+          // Top side (y) moves up/down
+
+          newBounds.w = Math.max(SHAPE_MIN_SIZE, world.x - initialBounds.x);
+          newBounds.h = Math.max(SHAPE_MIN_SIZE, initialBounds.y + initialBounds.h - world.y);
+          newBounds.y = initialBounds.y + initialBounds.h - newBounds.h;
+          // x stays the same (left side pinned)
           break;
         case 'sw':
-          newBounds.w = Math.max(10, initialBounds.w + (initialBounds.x - world.x));
-          newBounds.h = Math.max(10, world.y - initialBounds.y);
-          newBounds.x = world.x;
+          // 📍 Dragging BOTTOM-LEFT corner
+          // The TOP-RIGHT corner stays put
+          // Left side (x) moves, bottom side stretches down
+
+          newBounds.w = Math.max(SHAPE_MIN_SIZE, initialBounds.x + initialBounds.w - world.x);
+          newBounds.h = Math.max(SHAPE_MIN_SIZE, world.y - initialBounds.y);
+          newBounds.x = initialBounds.x + initialBounds.w - newBounds.w;
+          // y stays the same (top side pinned)
           break;
         case 'se':
-          newBounds.w = Math.max(10, world.x - initialBounds.x);
-          newBounds.h = Math.max(10, world.y - initialBounds.y);
+          // 📍 Dragging BOTTOM-RIGHT corner (easiest!)
+          // The TOP-LEFT corner stays put
+          // Just stretch width and height from the mouse position
+
+          newBounds.w = Math.max(SHAPE_MIN_SIZE, world.x - initialBounds.x);
+          newBounds.h = Math.max(SHAPE_MIN_SIZE, world.y - initialBounds.y);
+          // x and y stay the same (top-left pinned)
           break;
       }
 
