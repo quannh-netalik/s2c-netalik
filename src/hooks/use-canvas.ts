@@ -31,6 +31,7 @@ import {
 import { AppDispatch, useAppSelector } from '@/redux/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useForceRender } from './use-force-render';
 
 interface TouchPointer {
   id: number;
@@ -137,16 +138,7 @@ export const useInfiniteCanvas = () => {
   const panRafRef = useRef<number | null>(null);
   const pendingPanPointRef = useRef<Point | null>(null);
 
-  // Add mounted ref to prevent setState after unmount
-  const isMountedRef = useRef<boolean>(true);
-
-  const [, force] = useState(0);
-  const requestRender = useCallback((): void => {
-    // Check if mounted before updating state
-    if (isMountedRef.current) {
-      force((n) => (n + 1) | 0);
-    }
-  }, []);
+  const { requestRender } = useForceRender();
 
   const localPointFromClient = useCallback((clientX: number, clientY: number): Point => {
     const el = canvasRef.current;
