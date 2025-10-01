@@ -1,6 +1,6 @@
 'use client';
 
-import { getFreeDrawBounds } from '@/lib/corner';
+import { polylineBox } from '@/lib/utils';
 import {
   addArrow,
   addEllipse,
@@ -386,11 +386,9 @@ export const useInfiniteCanvas = () => {
             const hitShape = getShapeAtPoint(world);
             if (hitShape) {
               const isAlreadySelected = selectedShapes[hitShape.id];
+              // Handle add extra shape
               if (!isAlreadySelected) {
-                if (!e.shiftKey) {
-                  dispatch(clearSelection());
-                }
-                dispatch(selectShape(hitShape.id));
+                dispatch(!e.shiftKey ? clearSelection() : selectShape(hitShape.id));
               }
 
               isMovingRef.current = true;
@@ -558,6 +556,7 @@ export const useInfiniteCanvas = () => {
       if (isDrawingRef.current) {
         if (draftShapeRef.current) {
           draftShapeRef.current.currentWorld = world;
+          requestRender();
         } else if (currentTool === 'free-draw') {
           freeDrawPointsRef.current.push(world);
         }
@@ -569,6 +568,7 @@ export const useInfiniteCanvas = () => {
       entityState.entities,
       getLocalPointFromPtr,
       getShapeAtPoint,
+      requestRender,
       schedulePanMove,
       viewport.mode,
       viewport.scale,
@@ -665,8 +665,8 @@ export const useInfiniteCanvas = () => {
     [onPointerUp],
   );
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent): void => {
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent): void => {
       if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) {
         e.preventDefault();
         isSpacePressed.current = true; // Keep the same ref name for consistency
@@ -680,16 +680,22 @@ export const useInfiniteCanvas = () => {
         buttonActionRefs.current['select']?.focus();
         dispatch(clearSelection()); // [optional] deselect everything
       }
-    };
+    },
+    [dispatch],
+  );
 
-    const onKeyUp = (e: KeyboardEvent): void => {
+  const onKeyUp = useCallback(
+    (e: KeyboardEvent): void => {
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
         e.preventDefault();
         isSpacePressed.current = false;
         dispatch(handToolDisable());
       }
-    };
+    },
+    [dispatch],
+  );
 
+  useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -779,9 +785,7 @@ export const useInfiniteCanvas = () => {
           }),
         );
       } else if (shape.type === 'free-draw') {
-        const { minX, maxX, minY, maxY } = getFreeDrawBounds(shape.points);
-        const width = maxX - minX;
-        const height = maxY - minY;
+        const { minX, minY, width, height } = polylineBox(shape.points);
 
         const newX = newBounds.x + RESIZE_PADDING; // remove padding
         const newY = newBounds.y + RESIZE_PADDING;
