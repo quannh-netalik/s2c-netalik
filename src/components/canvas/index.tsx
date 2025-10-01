@@ -1,11 +1,12 @@
 'use client';
 
-import { useInfiniteCanvas } from '@/hooks/use-canvas';
 import { FC, Fragment } from 'react';
-import TextSideBar from './text-sidebar';
+import { useInfiniteCanvas } from '@/hooks/use-canvas';
 import { cn } from '@/lib/utils';
+import TextSideBar from './text-sidebar';
 import ShapeRenderer from './shapes';
-import RectanglePreview from './shapes/rectangle/preview';
+import DraftShape from './shapes/draft';
+import FreeDrawStrokePreview from './shapes/stroke/preview';
 
 const InfiniteCanvas: FC = () => {
   const {
@@ -25,7 +26,9 @@ const InfiniteCanvas: FC = () => {
   } = useInfiniteCanvas();
 
   const draftShape = getDraftShape();
+  const freeDrawPoints = getFreeDrawPoints();
 
+  console.log({ isSidebarOpen, hasSelectedText });
   return (
     <Fragment>
       <TextSideBar isOpen={isSidebarOpen && hasSelectedText} />
@@ -62,12 +65,15 @@ const InfiniteCanvas: FC = () => {
             <ShapeRenderer key={shape.id} shape={shape} />
           ))}
 
-          {draftShape && draftShape.type === 'rect' && (
-            <RectanglePreview
+          {draftShape && (
+            <DraftShape
+              type={draftShape.type}
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
+
+          {freeDrawPoints.length > 0 && <FreeDrawStrokePreview points={freeDrawPoints} />}
         </div>
       </div>
     </Fragment>

@@ -6,7 +6,7 @@ type FreeDrawStrokePreviewProps = {
   points: ReadonlyArray<Point>;
 };
 
-export const FreeDrawStrokePreview: FC<FreeDrawStrokePreviewProps> = ({ points }) => {
+const FreeDrawStrokePreview: FC<FreeDrawStrokePreviewProps> = ({ points }) => {
   if (points.length < 2) return null;
 
   const { minX, minY, width, height } = polylineBox(points);
@@ -37,3 +37,5 @@ export const FreeDrawStrokePreview: FC<FreeDrawStrokePreviewProps> = ({ points }
     </svg>
   );
 };
+
+export default FreeDrawStrokePreview;

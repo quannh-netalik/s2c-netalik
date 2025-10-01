@@ -8,6 +8,7 @@ type TextComponentProps = {
   shape: TextShape;
 };
 
+// TODO: Fix style
 const TextComponent: FC<TextComponentProps> = ({ shape }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(shape.text === 'Type here...');
