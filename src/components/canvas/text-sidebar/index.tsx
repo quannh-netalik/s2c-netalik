@@ -37,7 +37,13 @@ const TextSideBar: FC<TextSideBarProps> = ({ isOpen }) => {
     [selectedShapes, shapeEntities],
   );
 
-  const [colorInput, setColorInput] = useState<string>(selectedTextShape?.fill || '#ffffff');
+  // If set default state with selectedTextShape, when selectedTextShape changes, useState doesn't re-initialize
+  // colorInput will still have the OLD shape's color
+  const [colorInput, setColorInput] = useState<string>('');
+  
+  // displayColor recomputes on every render, so when selectedTextShape changes,
+  // displayColor automatically reflects the new shape's fill
+  const displayColor = colorInput || selectedTextShape?.fill || '#ffffff';
 
   const updateTextProperty = useCallback(
     (property: keyof TextShape, value: string | number) => {
@@ -60,6 +66,7 @@ const TextSideBar: FC<TextSideBarProps> = ({ isOpen }) => {
       setColorInput(color);
       if (/^#[0-9A-F]{6}$/i.test(color) || /^#[0-9A-F]{3}$/i.test(color)) {
         updateTextProperty('fill', color);
+        setColorInput(''); // Clear local override once valid color is applied
       }
     },
     [updateTextProperty],
@@ -208,7 +215,7 @@ const TextSideBar: FC<TextSideBarProps> = ({ isOpen }) => {
           </Label>
           <div className="flex gap-2">
             <Input
-              value={colorInput}
+              value={displayColor}
               onChange={(e) => handleColorChange(e.target.value)}
               placeholder="#ffffff"
               className="bg-white/5 border-white/10 text-white flex-1"
