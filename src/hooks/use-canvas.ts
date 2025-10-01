@@ -386,23 +386,30 @@ export const useInfiniteCanvas = () => {
             const hitShape = getShapeAtPoint(world);
             if (hitShape) {
               const isAlreadySelected = selectedShapes[hitShape.id];
+
+              // Determine which shapes will be moved BEFORE dispatching
+              const shapesToMove = isAlreadySelected
+                ? Object.keys(selectedShapes) // Keep current selection
+                : [hitShape.id]; // Only the newly clicked shape
+
               // Handle add extra shape
               if (!isAlreadySelected) {
-                dispatch(!e.shiftKey ? clearSelection() : selectShape(hitShape.id));
+                if (!e.shiftKey) {
+                  dispatch(clearSelection());
+                }
+                dispatch(selectShape(hitShape.id));
               }
 
               isMovingRef.current = true;
               moveStartRef.current = world;
 
               initialShapePositionRef.current = {};
-              Object.keys(selectedShapes).forEach((id) => {
+              shapesToMove.forEach((id) => {
                 const shape = entityState.entities[id];
                 if (shape) {
                   setInitialShapePosition(shape);
                 }
               });
-
-              setInitialShapePosition(hitShape);
             } else {
               // Clicked on empty space - clear selection and blur any active text inputs
               if (!e.shiftKey) {

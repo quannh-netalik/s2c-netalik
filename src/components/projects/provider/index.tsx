@@ -8,7 +8,7 @@ import { Id } from '../../../../convex/_generated/dataModel';
 import { useAppDispatch } from '@/redux/store';
 import { Project } from '@/types/project.type';
 import { loadProject } from '@/redux/slice/shapes';
-import { restoreViewport } from '@/redux/slice/viewport';
+import { resetView, restoreViewport } from '@/redux/slice/viewport';
 
 type ProjectProviderProps = {
   children: ReactNode;
@@ -38,6 +38,13 @@ const ProjectProvider: FC<ProjectProviderProps> = ({ initialProject, children })
       // Restore viewport position if available
       if (projectData.viewportData) {
         dispatch(restoreViewport(projectData.viewportData));
+      } else {
+        /**
+         * If a user opens a project that lacks viewportData after viewing one that had zoom/pan saved,
+         * the previous viewport remains in Redux, so the new project renders with the old camera offset/scale.
+         * We need to explicitly reset the viewport slice when there is no persisted viewport data.
+         */
+        dispatch(resetView());
       }
     }
   }, [dispatch, initialProject]);
