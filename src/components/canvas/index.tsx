@@ -28,7 +28,6 @@ const InfiniteCanvas: FC = () => {
   const draftShape = getDraftShape();
   const freeDrawPoints = getFreeDrawPoints();
 
-  console.log({ isSidebarOpen, hasSelectedText });
   return (
     <Fragment>
       <TextSideBar isOpen={isSidebarOpen && hasSelectedText} />
