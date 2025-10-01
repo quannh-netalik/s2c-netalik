@@ -4,6 +4,8 @@ import { useInfiniteCanvas } from '@/hooks/use-canvas';
 import { FC, Fragment } from 'react';
 import TextSideBar from './text-sidebar';
 import { cn } from '@/lib/utils';
+import ShapeRenderer from './shapes';
+import RectanglePreview from './shapes/rectangle/preview';
 
 const InfiniteCanvas: FC = () => {
   const {
@@ -21,6 +23,8 @@ const InfiniteCanvas: FC = () => {
     isSidebarOpen,
     hasSelectedText,
   } = useInfiniteCanvas();
+
+  const draftShape = getDraftShape();
 
   return (
     <Fragment>
@@ -55,8 +59,15 @@ const InfiniteCanvas: FC = () => {
           }}
         >
           {shapes.map((shape) => (
-            <div key={shape.id} />
+            <ShapeRenderer key={shape.id} shape={shape} />
           ))}
+
+          {draftShape && draftShape.type === 'rect' && (
+            <RectanglePreview
+              startWorld={draftShape.startWorld}
+              currentWorld={draftShape.currentWorld}
+            />
+          )}
         </div>
       </div>
     </Fragment>
