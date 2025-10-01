@@ -29,7 +29,7 @@ import {
   wheelZoom,
 } from '@/redux/slice/viewport';
 import { AppDispatch, useAppSelector } from '@/redux/store';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 interface TouchPointer {
@@ -42,7 +42,7 @@ const SHAPE_MIN_SIZE = 10;
 const RESIZE_PADDING = 5;
 
 interface DraftShape {
-  type: 'frame' | 'rect' | 'ellipse' | 'arrow' | 'line';
+  type: Shape['type'];
   startWorld: Point;
   currentWorld: Point;
 }
@@ -58,9 +58,13 @@ export const useInfiniteCanvas = () => {
   const viewport = useAppSelector((s) => s.viewport);
 
   const entityState = useAppSelector((s) => s.shapes.shapes);
-  const shapeList: Shape[] = entityState.ids
-    .map((id) => entityState.entities[id])
-    .filter((s: Shape | undefined): s is Shape => Boolean(s));
+  const shapeList: Shape[] = useMemo(
+    () =>
+      entityState.ids
+        .map((id) => entityState.entities[id])
+        .filter((s: Shape | undefined): s is Shape => Boolean(s)),
+    [entityState.entities, entityState.ids],
+  );
 
   const currentTool = useAppSelector((s) => s.shapes.tool);
   const selectedShapes = useAppSelector((s) => s.shapes.selected);
@@ -68,10 +72,14 @@ export const useInfiniteCanvas = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const shapesEntities = useAppSelector((s) => s.shapes.shapes.entities);
 
-  const hasSelectedText = Object.keys(selectedShapes).some((id) => {
-    const shape = shapesEntities[id];
-    return shape?.type === 'text';
-  });
+  const hasSelectedText: boolean = useMemo(
+    () =>
+      Object.keys(selectedShapes).some((id) => {
+        const shape = shapesEntities[id];
+        return shape?.type === 'text';
+      }),
+    [selectedShapes, shapesEntities],
+  );
 
   useEffect(() => {
     if (hasSelectedText && !isSidebarOpen) {
