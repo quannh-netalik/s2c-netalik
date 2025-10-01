@@ -8,17 +8,21 @@ type LineComponentProps = {
 const LineComponent: FC<LineComponentProps> = ({ shape }) => {
   const { startX, startY, endX, endY } = shape;
 
+  // Calculate bounding box with padding for strokeWidth and line caps (dynamic padding)
+  // https://github.com/quannh-netalik/s2c-netalik/pull/4#discussion_r2394313627
+  const padding = Math.max(shape.strokeWidth / 2, 1);
+
   // Calculate bounding box for the SVG
-  const minX = Math.min(startX, endX) - 5;
-  const minY = Math.min(startY, endY) - 5;
-  const maxX = Math.max(startX, endX) + 5;
-  const maxY = Math.max(startY, endY) + 5;
+  const minX = Math.min(startX, endX) - padding;
+  const minY = Math.min(startY, endY) - padding;
+  const maxX = Math.max(startX, endX) + padding;
+  const maxY = Math.max(startY, endY) + padding;
   const width = maxX - minX;
   const height = maxY - minY;
 
   return (
     <svg
-      className="absolute pointer-events-none z-10"
+    className="absolute pointer-events-none z-10"
       style={{
         left: minX,
         top: minY,

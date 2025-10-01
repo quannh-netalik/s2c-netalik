@@ -11,18 +11,18 @@ import TextComponent from './text';
 
 type ShapeRendererProps = {
   shape: Shape;
-  toggleInspiration: () => void;
-  toggleChat: (generatedUIId: string) => void;
-  generateWorkflow: (generatedUIId: string) => void;
-  exportDesign: (generatedUIId: string, element: HTMLElement | null) => void;
+  // toggleInspiration: () => void;
+  // toggleChat: (generatedUIId: string) => void;
+  // generateWorkflow: (generatedUIId: string) => void;
+  // exportDesign: (generatedUIId: string, element: HTMLElement | null) => void;
 };
 
 const ShapeRenderer: FC<ShapeRendererProps> = ({
   shape,
-  toggleInspiration,
-  toggleChat,
-  generateWorkflow,
-  exportDesign,
+  // toggleInspiration,
+  // toggleChat,
+  // generateWorkflow,
+  // exportDesign,
 }) => {
   switch (shape.type) {
     case 'rect':
