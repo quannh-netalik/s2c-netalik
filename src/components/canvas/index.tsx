@@ -62,15 +62,15 @@ const InfiniteCanvas: FC = () => {
           }}
         >
           {shapes.map((shape) => (
-            <Fragment key={shape.id}>
-              <ShapeRenderer key={`render-${shape.id}`} shape={shape} />
+            <ShapeRenderer key={`render-${shape.id}`} shape={shape} />
+          ))}
 
-              <SelectionOverlay
-                key={`selection-${shape.id}`}
-                shape={shape}
-                isSelected={!!selectedShapes[shape.id]}
-              />
-            </Fragment>
+          {shapes.map((shape) => (
+            <SelectionOverlay
+              key={`selection-${shape.id}`}
+              shape={shape}
+              isSelected={!!selectedShapes[shape.id]}
+            />
           ))}
 
           {draftShape && (
