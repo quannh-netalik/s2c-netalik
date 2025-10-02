@@ -7,6 +7,7 @@ import TextSideBar from './text-sidebar';
 import ShapeRenderer from './shapes';
 import DraftShape from './shapes/draft';
 import FreeDrawStrokePreview from './shapes/stroke/preview';
+import SelectionOverlay from './selection';
 
 const InfiniteCanvas: FC = () => {
   const {
@@ -61,7 +62,15 @@ const InfiniteCanvas: FC = () => {
           }}
         >
           {shapes.map((shape) => (
-            <ShapeRenderer key={shape.id} shape={shape} />
+            <Fragment key={shape.id}>
+              <ShapeRenderer key={`render-${shape.id}`} shape={shape} />
+
+              <SelectionOverlay
+                key={`selection-${shape.id}`}
+                shape={shape}
+                isSelected={!!selectedShapes[shape.id]}
+              />
+            </Fragment>
           ))}
 
           {draftShape && (
@@ -72,7 +81,9 @@ const InfiniteCanvas: FC = () => {
             />
           )}
 
-          {freeDrawPoints.length > 0 && <FreeDrawStrokePreview points={freeDrawPoints} />}
+          {currentTool === 'free-draw' && freeDrawPoints.length > 1 && (
+            <FreeDrawStrokePreview points={freeDrawPoints} />
+          )}
         </div>
       </div>
     </Fragment>
