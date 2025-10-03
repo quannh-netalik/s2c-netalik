@@ -210,8 +210,9 @@ export const generateFrameSnapshot = async (
       (blob) => {
         if (blob) {
           resolve(blob);
+        } else {
+          reject(new Error('Failed to create image blob'));
         }
-        reject(new Error('Failed to create image blob'));
       },
       'image/png',
       1.0,
