@@ -8,10 +8,11 @@ import RectangleComponent from './rectangle';
 import StrokeComponent from './stroke';
 import LineComponent from './line';
 import TextComponent from './text';
+import FrameComponent from './frame';
 
 type ShapeRendererProps = {
   shape: Shape;
-  // toggleInspiration: () => void;
+  toggleInspiration: () => void;
   // toggleChat: (generatedUIId: string) => void;
   // generateWorkflow: (generatedUIId: string) => void;
   // exportDesign: (generatedUIId: string, element: HTMLElement | null) => void;
@@ -19,12 +20,14 @@ type ShapeRendererProps = {
 
 const ShapeRenderer: FC<ShapeRendererProps> = ({
   shape,
-  // toggleInspiration,
+  toggleInspiration,
   // toggleChat,
   // generateWorkflow,
   // exportDesign,
 }) => {
   switch (shape.type) {
+    case 'frame':
+      return <FrameComponent shape={shape} toggleInspiration={toggleInspiration} />;
     case 'rect':
       return <RectangleComponent shape={shape} />;
     case 'ellipse':
