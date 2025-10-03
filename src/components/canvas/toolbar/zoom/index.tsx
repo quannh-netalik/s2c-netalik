@@ -92,7 +92,7 @@ const ZoomBar: FC = () => {
           size="lg"
           onClick={handleZoomIn}
           className="w-9 h-9 p-0 rounded-full cursor-pointer hover:bg-white/[0.12] border border-transparent hover:border-white/[0.16] transition-all"
-          title="Zoom Out"
+          title="Zoom In"
         >
           <ZoomIn className="w-4 h-4 text-primary/50" />
         </Button>

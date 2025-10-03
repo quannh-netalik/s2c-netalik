@@ -62,7 +62,7 @@ const InfiniteCanvas: FC = () => {
           }}
         >
           {shapes.map((shape) => (
-            <ShapeRenderer key={`render-${shape.id}`} shape={shape} />
+            <ShapeRenderer key={`render-${shape.id}`} shape={shape} toggleInspiration={() => {}} />
           ))}
 
           {shapes.map((shape) => (
