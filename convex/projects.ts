@@ -1,4 +1,4 @@
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
 import { getNextProjectNumber, getProjectsByUserId } from './utils/project.util';
@@ -83,5 +83,27 @@ export const getUserProjects = query({
       createdAt: project.createdAt,
       isPublic: project.isPublic,
     }));
+  },
+});
+
+export const updateProjectSketches = mutation({
+  args: {
+    projectId: v.id('projects'),
+    sketchesData: v.any(),
+    viewportData: v.optional(v.any()),
+  },
+  handler: async (ctx, { projectId, sketchesData, viewportData }) => {
+    const project = await ctx.db.get(projectId);
+    if (!project) throw new ConvexError('Project not found');
+
+    const updateData = {
+      sketchesData,
+      lastModified: Date.now(),
+      ...(viewportData && { viewportData }),
+    };
+
+    await ctx.db.patch(projectId, updateData);
+    console.log('✅ [Convex] Project autosaved successfully!');
+    return { success: true };
   },
 });
