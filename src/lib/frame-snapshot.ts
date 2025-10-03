@@ -43,7 +43,7 @@ export const isShapeInsideFrame = (shape: Shape, frame: FrameShape): boolean => 
     case 'arrow':
       // Check if either start or end point is within frame
       const startInside = _isShapeInsideFrame({ x: shape.startX, y: shape.startY });
-      const endInside = _isShapeInsideFrame({ x: shape.startX, y: shape.startY });
+      const endInside = _isShapeInsideFrame({ x: shape.endX, y: shape.endY });
 
       return startInside || endInside;
     default:
