@@ -30,7 +30,11 @@ export const useFrame = (shape: FrameShape) => {
       if (projectId) {
         formData.append('projectId', projectId);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsGenerating(false);
+    }
   }, [allShapes, shape]);
 
   return {
