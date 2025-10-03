@@ -1,14 +1,14 @@
 import { cn } from '@/lib/utils';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, MouseEvent, CSSProperties } from 'react';
 
 type LiquidGlassButtonProps = {
   children: ReactNode;
-  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (e?: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'subtle';
   disabled?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
 const LiquidGlassButton: FC<LiquidGlassButtonProps> = ({
@@ -52,7 +52,7 @@ const LiquidGlassButton: FC<LiquidGlassButtonProps> = ({
         // Interact states
         'hover:bg-white/[0.12] hover:border-white/[0.16]',
         'active:bg-white/[0.06] active:scale-[0.98]',
-        'focus:outline-none focus:ring-2 focus: ring-white/20 focus:ring-offset-2 focus:ring-offset-transparent',
+        'focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-transparent',
 
         // Disabled state
         disabled &&
