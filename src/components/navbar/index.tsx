@@ -1,16 +1,19 @@
 'use client';
 
+import { FC, ReactNode, useMemo } from 'react';
 import { useQuery } from 'convex/react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { FC, ReactNode, useMemo } from 'react';
+import { CircleQuestionMark, Hash, LayoutTemplate, User } from 'lucide-react';
+
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
-import { CircleQuestionMark, Hash, LayoutTemplate, User } from 'lucide-react';
+
+import { useAppSelector } from '@/redux/store';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useAppSelector } from '@/redux/store';
 import CreateProject from '../buttons/project';
+import AutoSave from '../canvas/autosave';
 
 type TabProps = {
   label: string;
@@ -40,7 +43,10 @@ const Navbar: FC = () => {
     [profile.name, projectId],
   );
 
-  const project = useQuery(api.projects.getProject, projectId ? { projectId: projectId as Id<'projects'> } : 'skip');
+  const project = useQuery(
+    api.projects.getProject,
+    projectId ? { projectId: projectId as Id<'projects'> } : 'skip',
+  );
 
   const pathname = usePathname();
 
@@ -109,6 +115,7 @@ const Navbar: FC = () => {
           </AvatarFallback>
         </Avatar>
 
+        {hasCanvas && <AutoSave />}
         {!hasCanvas && !hasStyleGuide && <CreateProject />}
       </div>
     </div>
