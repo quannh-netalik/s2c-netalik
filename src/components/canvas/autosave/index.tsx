@@ -45,33 +45,30 @@ const AutoSave: FC = () => {
 
     debounceRef.current = setTimeout(async () => {
       lastSavedRef.current = stateString;
-      if (abortRef.current) {
-        abortRef.current.abort();
-      }
-
-      abortRef.current = new AbortController();
+      abortRef.current?.abort();
       setSaveStatus('saving');
 
-      let idleTimeOut;
+      abortRef.current = new AbortController();
+
+      const request = autosaveProject({
+        projectId: projectId as string,
+        userId: user?.id as string,
+        shapesData: shapes as unknown as AutosaveProjectRequest['shapesData'],
+        viewportData: {
+          scale: viewport.scale,
+          translate: viewport.translate,
+        },
+      });
+
       try {
-        await autosaveProject({
-          projectId: projectId as string,
-          userId: user?.id as string,
-          shapesData: shapes as unknown as AutosaveProjectRequest['shapesData'],
-          viewportData: {
-            scale: viewport.scale,
-            translate: viewport.translate,
-          },
-        }).unwrap();
+        await request.unwrap();
 
         setSaveStatus('saved');
-        idleTimeOut = timer.saved;
+        setTimeout(() => setSaveStatus('idle'), timer.saved);
       } catch (error) {
         if ((error as Error).name === 'AbortError') return;
         setSaveStatus('error');
-        idleTimeOut = timer.error;
-      } finally {
-        setTimeout(() => setSaveStatus('idle'), idleTimeOut);
+        setTimeout(() => setSaveStatus('idle'), timer.error);
       }
     }, timer.saving);
 
@@ -104,7 +101,7 @@ const AutoSave: FC = () => {
           <CheckCircle className="w-4 h-4" />
         </div>
       );
-    case 'saved':
+    case 'error':
       return (
         <div className="flex items-center">
           <AlertCircle className="w-4 h-4" />
