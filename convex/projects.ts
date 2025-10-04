@@ -89,13 +89,31 @@ export const getUserProjects = query({
 export const updateProjectSketches = mutation({
   args: {
     projectId: v.id('projects'),
-    sketchesData: v.any(),
-    viewportData: v.optional(v.any()),
+    userId: v.id('users'),
+    sketchesData: v.object({
+      shapes: v.any(), // or define specific shape schema
+      tool: v.string(),
+      selected: v.any(),
+      frameCounter: v.number(),
+    }),
+    viewportData: v.optional(
+      v.object({
+        scale: v.number(),
+        translate: v.object({
+          x: v.number(),
+          y: v.number(),
+        }),
+      }),
+    ),
   },
-  handler: async (ctx, { projectId, sketchesData, viewportData }) => {
+  handler: async (ctx, { projectId, userId, sketchesData, viewportData }) => {
+  
     const project = await ctx.db.get(projectId);
     if (!project) throw new ConvexError('Project not found');
 
+    if (project.userId !== userId) {
+      throw new ConvexError('Unauthorized: You do not own this project');
+    }
     const updateData = {
       sketchesData,
       lastModified: Date.now(),
