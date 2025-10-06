@@ -1,3 +1,4 @@
+import SubscribeButton from '@/components/buttons/checkout';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -144,6 +145,7 @@ const Page: FC = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-3 pt-4 px-6 pb-6">
+            <SubscribeButton />
             <p className="text-muted-foreground text-xs text-center">
               Cancel anytime - No setup fees - Instant access
             </p>
