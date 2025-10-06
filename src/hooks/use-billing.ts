@@ -5,9 +5,10 @@ import { toast } from 'sonner';
 
 export const useSubscriptionPlan = () => {
   const [trigger, { isFetching }] = useLazyGetCheckoutQuery();
-  const userId = useAppSelector((s) => s.profile.user!.id);
+  const userId = useAppSelector((s) => s.profile.user?.id);
 
   const onSubscribe = useCallback(async () => {
+    if (!userId) return;
     try {
       const res = await trigger(userId).unwrap();
       window.location.href = res.url;

@@ -4,7 +4,7 @@ import { Id } from './_generated/dataModel';
 
 const DEFAULT_GRANT = 10;
 const DEFAULT_ROLLOVER_LIMIT = 100;
-const ENTITLED = new Set(['active', 'trailing']);
+const ENTITLED = new Set(['active', 'trialing']);
 
 export const hasEntitlement = query({
   args: { userId: v.id('users') },
@@ -178,7 +178,7 @@ export const granCreditsIfNeeded = mutation({
       return {
         ok: true,
         skipped: true,
-        reason: 'not-titled',
+        reason: 'not-entitled',
       };
     }
 
