@@ -18,7 +18,7 @@ const subscriptions = defineTable({
   metadata: v.optional(v.any()),
   creditBalance: v.number(),
   creditsGrantPerPeriod: v.number(),
-  creditRolloverLimit: v.number(),
+  creditsRolloverLimit: v.number(),
   lastGrantCursor: v.optional(v.string()),
 })
   .index("by_userId", ["userId"])
