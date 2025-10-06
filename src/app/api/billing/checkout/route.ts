@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const polar = new Polar({
-    server: String(process.env.NODE_ENV) === 'sandbox' ? 'sandbox' : 'production',
+    server: process.env.POLAR_ENV === 'sandbox' ? 'sandbox' : 'production',
     accessToken: process.env.POLAR_ACCESS_TOKEN!,
   });
 
