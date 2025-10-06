@@ -16,6 +16,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     verified = validateEvent(Buffer.from(raw), headersObject, secret);
   } catch (error) {
+    console.error(error);
     if (error instanceof WebhookVerificationError) {
       return new NextResponse('Invalid Signature', { status: 403 });
     }

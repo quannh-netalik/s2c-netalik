@@ -113,11 +113,11 @@ export const handlePolarEvent = inngest.createFunction(
       status: sub?.status ?? 'updated',
       currentPeriodEnd: toMs(sub?.current_period_end),
       trialEndsAt: toMs(sub?.trial_ends_at),
-      cancelAt: toMs(sub?.canceled_at),
+      canceledAt: toMs(sub?.canceled_at),
       seats: sub?.seats ?? undefined,
       metadata: dataUnknown, // Keep as any to match Convex schema
-      creditGrantPerPeriod: 10,
-      creditRolloverLimit: 100,
+      creditsGrantPerPeriod: 10,
+      creditsRolloverLimit: 100,
     };
 
     console.log('📋 [Inngest] Subscription payload: ', JSON.stringify(payload, null, 2));

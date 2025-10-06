@@ -58,6 +58,7 @@ export const extractSubscriptionLike = (data: unknown): PolarSubscription | null
       return {
         id,
         status,
+        current_period_end: sub.current_period_end as string | undefined | null,
         trial_ends_at: sub.trial_ends_at as string | undefined | null,
         canceled_at: sub.canceled_at as string | undefined | null,
         customer: sub.customer as PolarCustomer | undefined | null,
@@ -112,11 +113,20 @@ export const toMs = (x: string | number | null | undefined): number | undefined 
   return Number.isNaN(t) ? undefined : t;
 };
 
-export const isEntitledStatus = (status: string): boolean => /^(active|trailing)$/i.test(status);
+export const isEntitledStatus = (status: string): boolean => /^(active|trialing)$/i.test(status);
 
-export const grantKey = (subId: string, periodEndMs?: number, eventId?: string | number): string =>
-  periodEndMs !== null
-    ? `${subId}:${periodEndMs}`
-    : eventId !== null
-      ? `${subId}:evt:${eventId}`
-      : `${subId}:first`;
+export const grantKey = (
+  subId: string,
+  periodEndMs?: number,
+  eventId?: string | number,
+): string => {
+  if (periodEndMs !== undefined && periodEndMs !== null) {
+    return `${subId}:${periodEndMs}`;
+  }
+
+  if (eventId !== undefined && eventId !== null) {
+    return `${subId}:evt:${eventId}`;
+  }
+
+  return `${subId}:first`;
+};
