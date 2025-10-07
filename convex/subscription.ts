@@ -137,7 +137,7 @@ export const upsertFromPolar = mutation({
   },
 });
 
-export const granCreditsIfNeeded = mutation({
+export const grantCreditsIfNeeded = mutation({
   args: {
     subscriptionId: v.id('subscriptions'),
     idempotencyKey: v.string(), // `${subId}:${periodEndMs || "first"}
