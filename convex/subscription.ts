@@ -220,3 +220,15 @@ export const grantCreditsIfNeeded = mutation({
     };
   },
 });
+
+export const getCreditsBalance = query({
+  args: { userId: v.id('users') },
+  handler: async (ctx, { userId }) => {
+    const sub = await ctx.db
+      .query('subscriptions')
+      .withIndex('by_userId', (q) => q.eq('userId', userId))
+      .first();
+
+    return sub?.creditBalance ?? 0;
+  },
+});
