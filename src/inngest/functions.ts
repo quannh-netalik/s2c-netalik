@@ -166,7 +166,7 @@ export const handlePolarEvent = inngest.createFunction(
         try {
           console.log('💾 [Inngest] Granting credits to subscription:', subscriptionId);
 
-          const result = await fetchMutation(api.subscription.granCreditsIfNeeded, {
+          const result = await fetchMutation(api.subscription.grantCreditsIfNeeded, {
             subscriptionId,
             idempotencyKey,
             amount: 10,

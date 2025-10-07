@@ -75,7 +75,7 @@ const Page: FC = () => {
             ? 'Confirming your entitlement...'
             : _timeout
               ? 'Taking longer than expected - redirecting to billing.'
-              : 'This should only tae a few seconds...'}
+              : 'This should only take a few seconds...'}
       </div>
     </div>
   );
