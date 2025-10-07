@@ -53,6 +53,10 @@ const Navbar: FC = () => {
   const hasCanvas = pathname.includes('canvas');
   const hasStyleGuide = pathname.includes('style-guide');
 
+  const creditBalance = useQuery(api.subscription.getCreditsBalance, {
+    userId: profile.id as Id<'users'>,
+  });
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 p-6 fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center gap-4">
@@ -100,7 +104,7 @@ const Navbar: FC = () => {
       </div>
 
       <div className="flex items-center gap-4 justify-end">
-        <span className="text-sm text-white/50">TODO: credits</span>
+        <span className="text-sm text-white/50">{creditBalance} credits</span>
         <Button
           variant="secondary"
           className="rounded-full h-12 w-12 flex items-center justify-center backdrop-blur-xl bg-white/[0.08] saturate-150 hover:bg-white/[0.12]"

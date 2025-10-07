@@ -27,7 +27,7 @@ const Page: FC = () => {
     // Still loading user
     if (me === undefined) return;
 
-    // Not singed in
+    // Not signed in
     if (me === null) {
       redirected.current = true;
       router.replace('/auth/sign-in');
