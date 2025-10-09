@@ -85,3 +85,18 @@ export const MoodBoardImagesQuery = async (projectId: string) => {
 
   return { images };
 };
+
+export const CreditBalanceQuery = async () => {
+  const profile = await ProfileQuery();
+  if (!profile?.id) {
+    return { ok: false, balance: 0, profile: null };
+  }
+
+  const balance = await preloadQuery(
+    api.subscription.getCreditsBalance,
+    { userId: profile.id as Id<'users'> },
+    { token: await convexAuthNextjsToken() },
+  );
+
+  return { ok: true, balance: balance._valueJSON, profile };
+};
