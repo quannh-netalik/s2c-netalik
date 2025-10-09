@@ -1,12 +1,14 @@
 'use client';
 
-import { FC, Fragment, useCallback, useRef } from 'react';
+import { FC, Fragment, use, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import { MoodBoardImage, useMoodBoard } from '@/hooks/use-style';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { BreakPoint, useIsMobile } from '@/hooks/use-mobile';
+import { useSearchParams } from 'next/navigation';
+import GenerateStyleGuideButton from '@/components/buttons/style-guide';
 
 const MobileImageBoard = dynamic(() => import('./responsive-image-board/mobile-image-board'));
 const DesktopImageBoard = dynamic(() => import('./responsive-image-board/desktop-image-board'));
@@ -28,12 +30,17 @@ const StyleGuideMoodBoard: FC<StyleGuideMoodBoardProps> = ({ guideImages }) => {
     fileInputRef.current?.click();
   }, []);
 
+  const searchParam = useSearchParams();
+  const projectId = searchParam.get('projectId');
+
   return (
     <div className="flex flex-col gap-10">
       <div
         className={cn(
           'relative border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-200 min-h-[400px] flex items-center justify-center',
-          dragActive ? 'border-primary bg-primary/5 scale-[1.02]' : 'border-border/50 hover:border-border',
+          dragActive
+            ? 'border-primary bg-primary/5 scale-[1.02]'
+            : 'border-border/50 hover:border-border',
         )}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -65,11 +72,29 @@ const StyleGuideMoodBoard: FC<StyleGuideMoodBoardProps> = ({ guideImages }) => {
           <EmptyImageBoard handleUploadClick={handleUploadClick} />
         )}
 
-        <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleFileInput} className="hidden" />
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleFileInput}
+          className="hidden"
+        />
       </div>
 
-      {/* TODO */}
-      <Button className="w-fit">Generate With AI</Button>
+      <GenerateStyleGuideButton
+        images={images}
+        fileInputRef={fileInputRef}
+        projectId={projectId ?? ''}
+      />
+
+      {images.length >= 5 && (
+        <div className="text-center p-4 bg-muted/50 rounded-2xl">
+          <p className="text-sm text-muted-foreground">
+            Maximum of 5 images reached. Remove some images to add more.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

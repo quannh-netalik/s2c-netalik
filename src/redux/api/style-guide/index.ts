@@ -1,3 +1,5 @@
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
 export interface ColorSwatch {
   name: string;
   hexColor: string;
@@ -35,3 +37,34 @@ export interface StyleGuide {
   colorSections: [ColorSection, ColorSection, ColorSection, ColorSection, ColorSection];
   typographySections: [TypographySection, TypographySection, TypographySection];
 }
+
+interface GenerateStyleGuideRequest {
+  projectId: string;
+}
+
+interface GenerateStyleGuideResponse {
+  success: boolean;
+  styleGuide: StyleGuide;
+  message: string;
+}
+
+export const StyleGuideApi = createApi({
+  reducerPath: 'styleGuideApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: '/api/generate',
+  }),
+  tagTypes: ['StyeGuide'],
+  endpoints: (builder) => ({
+    generateStyleGuide: builder.mutation<GenerateStyleGuideResponse, GenerateStyleGuideRequest>({
+      query: ({ projectId }) => ({
+        url: '/style',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: { projectId },
+      }),
+      invalidatesTags: ['StyeGuide'],
+    }),
+  }),
+});
+
+export const { useGenerateStyleGuideMutation } = StyleGuideApi;
