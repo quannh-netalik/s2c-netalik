@@ -107,7 +107,6 @@ export const updateProjectSketches = mutation({
     ),
   },
   handler: async (ctx, { projectId, userId, sketchesData, viewportData }) => {
-  
     const project = await ctx.db.get(projectId);
     if (!project) throw new ConvexError('Project not found');
 
@@ -123,5 +122,26 @@ export const updateProjectSketches = mutation({
     await ctx.db.patch(projectId, updateData);
     console.log('✅ [Convex] Project autosaved successfully!');
     return { success: true };
+  },
+});
+
+export const updateProjectStyleGuide = mutation({
+  args: {
+    projectId: v.id('projects'),
+    styleGuideData: v.any(),
+  },
+  handler: async (ctx, { projectId, styleGuideData }) => {
+    console.log('🎨 [Convex] Updating style guide for project:', projectId);
+    const userId = await getUserId(ctx);
+    await getProjectsByUserId(ctx, projectId, userId);
+
+    await ctx.db.patch(projectId, {
+      styleGuide: JSON.stringify(styleGuideData),
+      lastModified: Date.now(),
+    });
+
+    console.log('✅ [Convex] Style guide updated successfully!');
+
+    return { success: true, styleGuide: styleGuideData };
   },
 });
